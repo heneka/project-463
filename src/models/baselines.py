@@ -8,7 +8,6 @@ class GATModel(nn.Module):
         self.embedding = nn.Embedding(num_nodes, embedding_dim)
         
         self.convs = nn.ModuleList()
-        # Initialize GAT layers. Note: GAT is feature transforming and non-linear.
         self.convs.append(GATConv(embedding_dim, embedding_dim // heads, heads=heads))
         for _ in range(num_layers - 1):
             self.convs.append(GATConv(embedding_dim, embedding_dim // heads, heads=heads))

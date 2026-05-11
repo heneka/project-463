@@ -3,7 +3,6 @@ import os
 import torch
 import numpy as np
 
-# Add src to the path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from data import get_movielens_dataset, prepare_data_splits
@@ -39,7 +38,7 @@ def main():
             val_data=val_data,
             test_data=test_data,
             num_nodes=num_nodes,
-            epochs=20, # Reduced for initial quick evaluation
+            epochs=20,
             lr=0.005,
             device=device
         )
@@ -57,7 +56,6 @@ def main():
     df = pd.DataFrame(results)
     print(df.to_string(index=False))
     
-    # Save to csv
     df.to_csv("results.csv", index=False)
     print("Results saved to results.csv")
 

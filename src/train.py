@@ -60,14 +60,11 @@ def train_one_epoch(model, optimizer, train_data, num_nodes):
     model.train()
     optimizer.zero_grad()
     
-    # 1. Negative sampling
     pos_edge_index, neg_edge_index = sample_negative_edges(train_data.edge_index, num_nodes)
     
-    # 2. Track VRAM
     torch.cuda.reset_peak_memory_stats()
     start_time = time.time()
     
-    # 3. Compute loss
     loss = model.get_bpr_loss(train_data.edge_index, pos_edge_index, neg_edge_index)
     loss.backward()
     optimizer.step()
@@ -102,7 +99,6 @@ def train(model, train_data, val_data, test_data, num_nodes, epochs=50, lr=0.001
     for epoch in range(1, epochs + 1):
         loss, ep_time, vram = train_one_epoch(model, optimizer, train_data, num_nodes=num_nodes)
         
-        # Evaluate
         if epoch % 10 == 0 or epoch == epochs:
             metrics = evaluate_metrics(model, val_data, val_data.edge_label_index, val_data.edge_label)
             print(f"Epoch {epoch:03d} | Loss: {loss:.4f} | Val Recall: {metrics['Recall@K']:.4f} | VRAM: {vram:.2f} MB | Time: {ep_time:.3f} s")
@@ -112,7 +108,6 @@ def train(model, train_data, val_data, test_data, num_nodes, epochs=50, lr=0.001
         history['epoch_times'].append(ep_time)
         history['peak_vram'].append(vram)
         
-    # Final Test
     print("Evaluating on Test Set...")
     test_metrics = evaluate_metrics(model, test_data, test_data.edge_label_index, test_data.edge_label)
     print(f"Test Metrics: {test_metrics}")

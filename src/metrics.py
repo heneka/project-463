@@ -12,10 +12,8 @@ def compute_recall_at_k(preds, targets, k=20):
     for user in targets.keys():
         if len(targets[user]) == 0:
             continue
-        # Get top-k predicted items
         top_k_preds = preds[user][:k]
         
-        # Calculate intersection
         hits = len(set(top_k_preds).intersection(set(targets[user])))
         recalls.append(hits / len(targets[user]))
         
@@ -65,18 +63,12 @@ def evaluate_metrics(model, data, edge_label_index, edge_label, k=20):
         else:
             scores = model.decode(u_emb, m_emb)
 
-        # F1-Score (Threshold at 0 since BPR output roughly centers on 0 diffs, or standard sigmoid)
         preds_cls = (scores > 0).float().cpu().numpy()
         targets_cls = edge_label.cpu().numpy()
         f1 = f1_score(targets_cls, preds_cls, average='macro', zero_division=0)
         
-        # Build dictionary to calculate ranking metrics (NDCG/Recall) specifically for positive tests
-        # Realistic Top-K eval requires scoring all unobserved items, but to keep the implementation
-        # tractable and fast using the provided RandomLinkSplit, we will calculate ranking on the
-        # specific edge_label_index.
         
         num_users = len(torch.unique(edge_label_index[0]))
-        # We group items by user
         users = edge_label_index[0].cpu().numpy()
         items = edge_label_index[1].cpu().numpy()
         scores_arr = scores.cpu().numpy()
@@ -93,7 +85,6 @@ def evaluate_metrics(model, data, edge_label_index, edge_label, k=20):
             if l == 1:
                 targets_dict[u].append(i)
                 
-        # Sort predictions per user by score
         for u in preds_dict:
             preds_dict[u].sort(key=lambda x: x[1], reverse=True)
             preds_dict[u] = [i for i, s in preds_dict[u]]
