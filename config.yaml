@@ -4,6 +4,7 @@ dataset:
   val_ratio: 0.1
   test_ratio: 0.1
   negative_sampling_ratio: 1.0
+  min_rating: 4
 
 training:
   epochs: 20
